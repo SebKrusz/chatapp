@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
 
 const Form = ({ type }) => {
 	const {
@@ -24,16 +25,33 @@ const Form = ({ type }) => {
 		if (type === "register") {
 			const res = await fetch("/api/auth/register", {
 				method: "POST",
-				body: JSON.stringify(data),
 				headers: {
 					"Content-Type": "application/json",
 				},
+				body: JSON.stringify(data),
 			});
+
 			if (res.ok) {
 				router.push("/");
 			}
+
 			if (res.error) {
-				toast.error("Something Went Wrong");
+				toast.error("Something went wrong");
+			}
+		}
+
+		if (type === "login") {
+			const res = await signIn("credentials", {
+				...data,
+				redirect: false,
+			});
+
+			if (res.ok) {
+				router.push("/chats");
+			}
+
+			if (res.error) {
+				toast.error("Invalid email or password");
 			}
 		}
 	};
