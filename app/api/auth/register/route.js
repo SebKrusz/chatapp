@@ -12,14 +12,13 @@ export const POST = async (req, res) => {
 			return new Response("User already exists", { status: 400 });
 		}
 		const hashedPassword = await hash(password, 10);
-
 		const newUser = await User.create({
 			username,
 			email,
 			password: hashedPassword,
 		});
 		await newUser.save();
-		return new Response(JSON.stringify(newUser), { status: 201 });
+		return new Response(JSON.stringify(newUser), { status: 200 });
 	} catch (err) {
 		console.log(err);
 		return new Response("Failed to create a new user", { status: 500 });
