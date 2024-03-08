@@ -1,9 +1,10 @@
 "use client";
 
-import { RadioButtonUnchecked } from "@mui/icons-material";
+import { CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
+import { useRouter } from "next/navigation";
 
 const Contacts = () => {
 	const [loading, setLoading] = useState(true);
@@ -33,6 +34,44 @@ const Contacts = () => {
 	useEffect(() => {
 		if (currentUser) getContacts();
 	}, [currentUser, search]);
+
+	const [selectedContacts, setSelectedContacts] = useState([]);
+
+	const isGroup = selectedContacts.length > 1;
+
+	const handleSelect = (contact) => {
+		if (selectedContacts.includes(contact)) {
+			setSelectedContacts((prevSelectedContacts) =>
+				prevSelectedContacts.filter((item) => item !== contact)
+			);
+		} else {
+			setSelectedContacts((prevSelectedContacts) => [
+				...prevSelectedContacts,
+				contact,
+			]);
+		}
+	};
+
+	const [name, setName] = useState("");
+
+	const router = useRouter();
+
+	const createChat = async () => {
+		const res = await fetch("/api/chats", {
+			method: "POST",
+			body: JSON.stringify({
+				currentUserId: currentUser.id,
+				members: selectedContacts.map((contact) => contact._id),
+				isGroup,
+				name,
+			}),
+		});
+		const chat = await res.json();
+		if (res.ok) {
+			router.push(`/chats/${chat._id}`);
+		}
+	};
+
 	return loading ? (
 		<Loader />
 	) : (
@@ -47,8 +86,16 @@ const Contacts = () => {
 				<div className="contact-list">
 					<p className="text-body-bold">Select or Deselect</p>
 					{contacts.map((user, index) => (
-						<div key={index} className="contact">
-							<RadioButtonUnchecked />
+						<div
+							key={index}
+							className="contact"
+							onClick={() => handleSelect(user)}>
+							{selectedContacts.find((item) => item === user) ? (
+								<CheckCircle sx={{ color: "red" }} />
+							) : (
+								<RadioButtonUnchecked />
+							)}
+
 							<img
 								src={user.profileImage || "assets/person.jpg"}
 								alt="profile"
@@ -59,7 +106,37 @@ const Contacts = () => {
 					))}
 				</div>
 				<div className="create-chat">
-					<button className="btn">Start a new chat</button>
+					{selectedContacts.length > 1 && (
+						<>
+							<div className="flex flex-col gap-3">
+								<p className="text-body-bold">
+									Group Chat Name
+								</p>
+								<input
+									placeholder="Enter group chat name"
+									className="input-group-name"
+									value={name}
+									onChange={(e) => setName(e.target.value)}
+								/>
+							</div>
+
+							<div className="flex flex-col gap-3 ">
+								<p className="text-body-bold">Members</p>
+								<div className="flex flex-wrap gap-3">
+									{selectedContacts.map((contact, index) => (
+										<p
+											className="selected-contact"
+											key={index}>
+											{contact.username}
+										</p>
+									))}
+								</div>
+							</div>
+						</>
+					)}
+					<button className="btn" onClick={createChat}>
+						Start a new chat
+					</button>
 				</div>
 			</div>
 		</div>
