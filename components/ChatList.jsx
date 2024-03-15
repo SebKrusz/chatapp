@@ -1,5 +1,8 @@
-import React, { use, useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import ChatBox from "./ChatBox";
+import Loader from "./Loader";
 
 const ChatList = () => {
 	const { data: sessions } = useSession();
@@ -24,11 +27,22 @@ const ChatList = () => {
 			getChats();
 		}
 	}, [currentUser]);
+
+	console.log(chats);
 	return loading ? (
 		<Loader />
 	) : (
 		<div className="chat-list">
 			<input placeholder="Search chat..." className="input-search" />
+			<div className="chats">
+				{chats?.map((chat, index) => (
+					<ChatBox
+						chat={chat}
+						index={index}
+						currentUser={currentUser}
+					/>
+				))}
+			</div>
 		</div>
 	);
 };
