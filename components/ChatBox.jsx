@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const ChatBox = ({ chat, currentUser }) => {
@@ -9,8 +10,12 @@ const ChatBox = ({ chat, currentUser }) => {
 	const lastMessage =
 		chat?.messages?.length > 0 &&
 		chat?.messages[chat?.messages.length - 1]?.text;
+
+	const router = useRouter();
 	return (
-		<div className="chat-box">
+		<div
+			className="chat-box"
+			onClick={() => router.push(`/chats/${chat._id}`)}>
 			<div className="class-info">
 				{chat?.isGroup ? (
 					<img
@@ -21,7 +26,7 @@ const ChatBox = ({ chat, currentUser }) => {
 				) : (
 					<img
 						src={
-							otherMembers[0].profilePhoto || "/assets/person.jpg"
+							otherMembers[0].profileImage || "/assets/person.jpg"
 						}
 						alt="profile-photo"
 						className="profilePhoto"
