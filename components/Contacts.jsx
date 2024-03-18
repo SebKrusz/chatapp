@@ -135,7 +135,7 @@ const Contacts = () => {
 						</>
 					)}
 					<button className="btn" onClick={createChat}>
-						Start a new chat
+						Find or Start a New Chat!
 					</button>
 				</div>
 			</div>
