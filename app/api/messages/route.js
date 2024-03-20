@@ -1,3 +1,4 @@
+import message from "@models/Message";
 import { connectToDB } from "@mongodb";
 
 export const POST = async (req) => {
@@ -5,7 +6,7 @@ export const POST = async (req) => {
 		connectToDB();
 		const body = req.json();
 		const { chatId, currentUserId, text, photo } = body;
-		const newMessage = await Message.create({
+		const newMessage = await message.create({
 			chat: chatId,
 			sender: currentUserId,
 			text,
