@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MessageSchema = new mongooose.MessageSchema({
+const MessageSchema = new mongoose.Schema({
 	chat: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Chat",
@@ -21,16 +21,13 @@ const MessageSchema = new mongooose.MessageSchema({
 		type: Date,
 		default: Date.now,
 	},
-	seenBy: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
-		},
-	],
-	default: [],
+	seenBy: {
+		type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+		default: [],
+	},
 });
 
-const message =
-	mongoose.model.Message || mongoose.model("Message", MessageSchema);
+const Message =
+	mongoose.models.Message || mongoose.model("Message", MessageSchema);
 
-export default message;
+export default Message;

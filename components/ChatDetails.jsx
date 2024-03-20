@@ -38,6 +38,25 @@ const ChatDetails = ({ chatId }) => {
 		if (currentUser && chatId) getChatDetails();
 	}, [currentUser, chatId]);
 
+	const sendText = async () => {
+		try {
+			const res = await fetch("/api/messages", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					chatId,
+					currentUserId: currentUser._id,
+					text,
+				}),
+			});
+			setText("");
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return loading ? (
 		<Loader />
 	) : (
@@ -96,7 +115,7 @@ const ChatDetails = ({ chatId }) => {
 						className="input-field"
 					/>
 				</div>
-				<div>
+				<div onClick={sendText}>
 					<img
 						src="/assets/send.jpg"
 						alt="send"
