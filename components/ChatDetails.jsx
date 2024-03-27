@@ -4,6 +4,7 @@ import Loader from "./Loader";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { CldUploadButton } from "next-cloudinary";
 
 const ChatDetails = ({ chatId }) => {
 	const [loading, setLoading] = useState(true);
@@ -57,6 +58,24 @@ const ChatDetails = ({ chatId }) => {
 		}
 	};
 
+	const sendPhoto = async (result) => {
+		try {
+			const res = await fetch("/api/messages", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					chatId,
+					currentUserId: currentUser._id,
+					photo: result?.info?.secure_url,
+				}),
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return loading ? (
 		<Loader />
 	) : (
@@ -98,14 +117,19 @@ const ChatDetails = ({ chatId }) => {
 			<div className="chat-body"></div>
 			<div className="send-message">
 				<div className="prepare-message">
-					<AddPhotoAlternate
-						sx={{
-							fontSize: "35px",
-							color: "#737373",
-							cursor: "pointer",
-							"&:hover": { color: "red" },
-						}}
-					/>
+					<CldUploadButton
+						options={{ maxFiles: 1 }}
+						onSuccess={sendPhoto}
+						uploadPreset="l66pngm1">
+						<AddPhotoAlternate
+							sx={{
+								fontSize: "35px",
+								color: "#737373",
+								cursor: "pointer",
+								"&:hover": { color: "red" },
+							}}
+						/>
+					</CldUploadButton>
 					<input
 						type="text"
 						placeholder="Write a message..."
