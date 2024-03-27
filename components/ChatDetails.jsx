@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CldUploadButton } from "next-cloudinary";
+import MessageBox from "./MessageBox";
 
 const ChatDetails = ({ chatId }) => {
 	const [loading, setLoading] = useState(true);
@@ -52,7 +53,9 @@ const ChatDetails = ({ chatId }) => {
 					text,
 				}),
 			});
-			setText("");
+			if (res.ok) {
+				setText("");
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -114,7 +117,15 @@ const ChatDetails = ({ chatId }) => {
 					</>
 				)}
 			</div>
-			<div className="chat-body"></div>
+			<div className="chat-body">
+				{chat?.messages?.map((message, index) => (
+					<MessageBox
+						key={index}
+						message={message}
+						currentUser={currentUser}
+					/>
+				))}
+			</div>
 			<div className="send-message">
 				<div className="prepare-message">
 					<CldUploadButton
