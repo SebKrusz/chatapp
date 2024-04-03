@@ -2,10 +2,11 @@
 import { AddPhotoAlternate } from "@mui/icons-material";
 import Loader from "./Loader";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { CldUploadButton } from "next-cloudinary";
 import MessageBox from "./MessageBox";
+import { pusherClient } from "@lib/pusher";
 
 const ChatDetails = ({ chatId }) => {
 	const [loading, setLoading] = useState(true);
@@ -78,6 +79,36 @@ const ChatDetails = ({ chatId }) => {
 			console.log(error);
 		}
 	};
+
+	useEffect(() => {
+		pusherClient.subscribe(chatId);
+
+		const handleMessage = async (newMessage) => {
+			setChat((prevChat) => {
+				return {
+					...prevChat,
+					messages: [...prevChat.messages, newMessage],
+				};
+			});
+		};
+
+		pusherClient.bind("new-message", handleMessage);
+
+		return () => {
+			pusherClient.unsubscribe(chatId);
+			pusherClient.unbind("new-message", handleMessage);
+		};
+	}, [chatId]);
+
+	/* Scrolling down to the bottom when having the new message */
+
+	const bottomRef = useRef(null);
+
+	useEffect(() => {
+		bottomRef.current?.scrollIntoView({
+			behavior: "smooth",
+		});
+	}, [chat?.messages]);
 
 	return loading ? (
 		<Loader />
