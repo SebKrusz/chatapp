@@ -19,7 +19,7 @@
 }
 
 .logo {
-	@apply w-52 h-auto;
+	@apply w-28 h-auto;
 }
 
 .form {
